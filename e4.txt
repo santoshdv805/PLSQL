@@ -1,0 +1,34 @@
+declare 
+	cbal kcb_acc_tab.bal%type;
+	vaccno kcb_acc_tab.accno%type;
+	i kcb_tran_tab%rowtype;
+
+	chk_bal_vio exception;
+	pragma exception_init(chk_bal_vio,-02290);
+begin
+	vaccno :=&accno;
+	i.amt:=&amount;
+	i.ttype:='&tran_type';
+	if i.amt<100 then 
+		raise_application_error(-20490,'Amount should be greator then 100');
+	end if;
+	select bal into cbal from kcb_acc_tab where accno=vaccno;
+	
+	if i.ttype='D' then
+		cbal:=cbal+i.amt;
+	elsif i.ttype='W' then
+		cbal:=cbal-i.amt;
+	else 
+		raise_application_error(-20490,'Invalid transaction it should be (D/W)');
+	end if;
+	insert into kcb_tran_tab values(nvl((select max(tid)from kcb_tran_tab),1000)+1,vaccno,i.ttype,sysdate,i.amt);
+	update kcb_acc_tab set bal=cbal where accno=vaccno;
+	display('Transaction compleated successfully');
+	commit;
+	exception 
+		when no_data_found then
+			display('Invalid account number');
+		when chk_bal_vio then
+			display('you can not withdraw money your balabce is too low');
+			rollback;
+end;	

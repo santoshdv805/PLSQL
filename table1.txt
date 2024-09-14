@@ -1,0 +1,15 @@
+create table kcb_acc_tab(
+accno number(4)constraint pk_acno primary key,
+name varchar2(20) constraint nn_nm not null,
+acctype char(2) constraint chk_actp check(acctype in('S','C','R')),
+doo date default sysdate,
+bal number(7,2) constraint nn_mn not null,
+constraint chk_bal check((acctype='S' and bal>=5000)or(acctype='C' and bal>=10000)or(acctype='R' and bal>=5000))
+)
+
+create table kcb_tran_tab(
+tid number(4)constraint pk_tid primary key,
+accno number(4) constraint fk_acon references kcb_acc_tab(accno),
+ttype char(2) constraint chk_ttp check(ttype in('D','W')),
+dot date default sysdate,
+amt number(7,2) constraint chk_amt check(amt>=100))

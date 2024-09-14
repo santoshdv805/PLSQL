@@ -1,0 +1,19 @@
+create or replace procedure load(filename varchar2)
+as 
+f_lob bfile;
+b_lob blob;
+image_name varchar2(30);
+dot_pos number;
+mime_type varchar2(30);
+begin
+	dot_pos:=instr(filename,'.');
+	image_name:=filename;
+	mime_type:=substr(filename,dot_pos+1);
+	insert into images values(image_name,mime_type,empty_blob())
+	return content into b_lob;
+	f_lob:=bfilename('san',filename);
+	dbms_lob.fileopen(f_lob,dbms_lob.file_readonly);
+	dbms_lob.loadfromfile(b_lob,f_lob,dbms_lob.getlength(f_lob));
+	dbms_lob.fileclose(f_lob);
+	commit;
+end;

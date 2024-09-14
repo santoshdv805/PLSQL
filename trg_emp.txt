@@ -1,0 +1,15 @@
+create or replace trigger trg_emp
+before insert or update
+on emp
+for each row
+declare 
+	i job_list%rowtype;
+begin
+	select low_pay,high_pay into i.low_pay,i.high_pay from job_list where job=initcap(:new.job);
+	if :new.sal not between i.low_pay and i.high_pay then
+		raise_application_error(-20345,'sal must between '||i.low_pay||'&'||i.high_pay);
+	end if;
+	EXCEPTION
+		when no_data_found then
+		raise_application_error(-20346,'INVAID JOB');
+end;

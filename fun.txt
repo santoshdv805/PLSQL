@@ -1,0 +1,29 @@
+create or replace function fun_eof(n in number,f out number)
+return varchar2
+is 
+t number;
+begin
+t:=n;
+f:=1;
+	while t<>0
+	loop
+		f:=f*t;
+		t:=t-1;
+	end loop;
+	if mod(t,2)=0 then
+		return('no is even');
+	else return('no is odd');
+	end if;
+end;
+======================================
+calling function
+======================================
+declare
+	n number:=&no;
+	f number;
+	v varchar2(20);
+begin 
+	v:=fun_eof(n,f);
+	display(f);
+	display(v);
+end;

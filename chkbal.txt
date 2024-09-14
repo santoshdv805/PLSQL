@@ -1,0 +1,17 @@
+create or replace function chk_bal(pacn in kcb_acc_tab.accno%type,
+pamt in kcb_tran_tab.amt%type)
+return boolean
+is
+vbal kcb_acc_tab.bal%type;
+vactype kcb_acc_tab.acctype%type;
+begin
+	select acctype,bal into vactype,vbal from kcb_acc_tab where accno=pacn;
+	vbal:=vbal-pamt;
+	if vactype='S' and vbal<5000 then 
+		return(false);
+	elsif vactype='C' and vbal<10000 then 
+		return(false);
+	else return(true);
+	end if;
+end;
+	
